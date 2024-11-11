@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "HelloWorld",
-    "slug": "expo-template-default",
+    "name": "Huskytasks",
+    "slug": "huskytasks",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,13 +13,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trevonnguyen.huskytasks"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.trevonnguyen.huskytasks"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +33,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c8053953-2af8-418d-817c-7c33e8ed6111"
+      }
+    },
+    "owner": "trevonnguyen",
+    "updates": {
+      "url": "https://u.expo.dev/c8053953-2af8-418d-817c-7c33e8ed6111"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }
