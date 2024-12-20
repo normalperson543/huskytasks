@@ -10,27 +10,29 @@ type Props = {
 export default function ItemCheckbox({title, isChecked, onValueChange}: Props) {
 
   return (
-    <View style={styles.container}>
-      <View style={styles.section}>
-        <Checkbox style={styles.checkbox} value={isChecked} onValueChange={onValueChange} />
-        <Text style={styles.paragraph}>{title}</Text>
-      </View>
+    <View style={styles.section}>
+      <Checkbox style={styles.checkbox} value={isChecked} onValueChange={onValueChange} />
+      <Text style={styles.paragraph}>{title}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginHorizontal: 16,
-    marginVertical: 32,
-  },
   section: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 12,
+    marginBottom: 12
   },
   paragraph: {
     fontSize: 15,
+    color: "#999",
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: "#20d782",
+    padding: 10,
+    width: 300
   },
   checkbox: {
     margin: 8,
