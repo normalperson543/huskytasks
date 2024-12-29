@@ -27,12 +27,12 @@ const styles = StyleSheet.create({
   },
   paragraph: {
     fontSize: 15,
-    color: "#999",
+    color: "#fff",
     borderWidth: 2,
     borderRadius: 10,
     borderColor: "#20d782",
     padding: 10,
-    width: 300
+    flexGrow: 1
   },
   checkbox: {
     margin: 8,
