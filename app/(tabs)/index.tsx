@@ -8,6 +8,7 @@ import { StyleSheet } from "react-native";
 import { TextInput } from "react-native";
 import AddItemModal from "@/components/AddItemModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Statistics from "@/components/Statistics";
 export default function Index() {
   const [toDoItems, setToDoItems] = useState<{id: number, name: string, isChecked: boolean, deleted: boolean}[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -40,6 +41,7 @@ export default function Index() {
      })
      console.log(newToDoItems);
      setToDoItems(newToDoItems as { id: number, name: string, isChecked: boolean, deleted: boolean}[]);
+     storeToDoItems(toDoItems);
   }
   function isChecked(id: number) {
     return toDoItems[id].isChecked;
@@ -59,14 +61,8 @@ export default function Index() {
     return toDoItems.length;
   }
   function deleteItem(id: number) {
-    const newToDoItems = toDoItems.map((item) => {
-      if (item.id == id) {
-        return {
-          ...item,
-          deleted: true
-        };
-      } else return item;
-     })
+    const newToDoItems = toDoItems.filter((item) => item.id != id)
+    console.log(newToDoItems);
      setToDoItems(newToDoItems as { id: number, name: string, isChecked: boolean, deleted: boolean}[]);
      storeToDoItems(toDoItems);
   }
@@ -74,13 +70,37 @@ export default function Index() {
   useEffect(() => {
     getToDoItems();
   }, [])
+
+  useEffect(() => {
+    let ignore = false;
+    const getToDoItems = async () => {
+      try {
+        let fetchedItems;
+        const jsonValue = await AsyncStorage.getItem('todo-items');
+        if (!ignore) {
+          fetchedItems = jsonValue != null ? JSON.parse(jsonValue) : null
+          if (JSON.stringify(fetchedItems) != JSON.stringify(toDoItems)) {
+            console.log("Testings")
+            setToDoItems(fetchedItems);
+          }
+        }
+      } catch (e) {
+        alert("There was a problem syncing your to-do list items. Please relaunch and try again.")
+      }
+    }
+    getToDoItems();
+    return () => {
+      ignore = true;
+    };
+}, [toDoItems])
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Huskytasks</Text>
         <AddItemButton addItem={() => setModalVisible(true)} />
       </View>
-      <Pressable onPress={() => storeToDoItems(toDoItems)}><Text style={styles.text}>Save it!</Text></Pressable>
+      <Statistics totalTasks={toDoItems.length} incompleteTasks={toDoItems.filter(item => !item.isChecked).length} completeTasks={toDoItems.filter(item => item.isChecked).length} />
+      <Pressable onPress={() => storeToDoItems([])}><Text style={styles.text}>RESET !!!</Text></Pressable>
       <GestureHandlerRootView style={{flex: 1}}>
         <View style={styles.toDoView}>
           <Text style={[styles.text, styles.secondaryHeaderText]}>To Do</Text>
