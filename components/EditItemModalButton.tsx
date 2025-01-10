@@ -4,11 +4,11 @@ import { MaterialIcons } from "@expo/vector-icons"
 type Props = {
     onPress: () => void
 }
-export default function AddItemModalButton({onPress}: Props) {
+export default function EditItemModalButton({onPress}: Props) {
     return (
         <Pressable style={styles.addButton} onPress={onPress}>
-            <MaterialIcons name="add" size={20} color="#000" style={styles.addIcon}/>
-            <Text style={styles.text}>Create a task</Text>
+            <MaterialIcons name="edit" size={20} color="#000" style={styles.addIcon}/>
+            <Text style={styles.text}>Apply changes</Text>
         </Pressable>
     )
 }

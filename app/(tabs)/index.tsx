@@ -7,22 +7,36 @@ import AddItemButton from "@/components/AddItemButton";
 import { StyleSheet } from "react-native";
 import { TextInput } from "react-native";
 import AddItemModal from "@/components/AddItemModal";
+import EditItemModal from "@/components/EditItemModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Statistics from "@/components/Statistics";
+import uuid from "react-native-uuid";
+import TagSelector from "@/components/TagSelector";
+
 export default function Index() {
-  const [toDoItems, setToDoItems] = useState<{id: number, name: string, isChecked: boolean, deleted: boolean}[]>([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [toDoItems, setToDoItems] = useState<{id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}[]>([]);
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [currentEdit, setCurrentEdit] = useState("");
   const [toDoModalValue, setToDoModalValue] = useState("");
+  const [tag, setTag] = useState("");
+  const [init, setInit] = useState(false);
+
   const getToDoItems = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('todo-items');
       console.log(jsonValue);
-      setToDoItems(jsonValue != null ? JSON.parse(jsonValue) : null)
+      if (jsonValue == null) {
+        setToDoItems([]);
+        storeToDoItems([]);
+      } else {
+        setToDoItems(JSON.parse(jsonValue as string))
+      }
     } catch (e) {
       alert("There was a problem getting your to-do list items. Please relaunch and try again.")
     }
   }
-  const storeToDoItems = async (value: {id: number, name: string, isChecked: boolean, deleted: boolean}[]) => {
+  const storeToDoItems = async (value: {id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}[]) => {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem('todo-items', jsonValue);
@@ -30,7 +44,7 @@ export default function Index() {
       alert("There was a problem saving your to-do list items. Please try again.");
     }
   }
-  function toggleChecked(id: number) {
+  function toggleChecked(id: string) {
      const newToDoItems = toDoItems.map((item) => {
       if (item.id == id) {
         return {
@@ -40,64 +54,89 @@ export default function Index() {
       } else return item;
      })
      console.log(newToDoItems);
-     setToDoItems(newToDoItems as { id: number, name: string, isChecked: boolean, deleted: boolean}[]);
-     storeToDoItems(toDoItems);
-  }
-  function isChecked(id: number) {
-    return toDoItems[id].isChecked;
+     setToDoItems(newToDoItems as { id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}[]);
   }
   function addItem(name: string) {
+    const generatedUUID = uuid.v4();
     setToDoItems([
       ...toDoItems,
       {
-        id: toDoItems.length,
+        id: generatedUUID,
         name: name,
+        dateAdded: new Date(),
         isChecked: false,
-        deleted: false
+        deleted: false,
+        tag: tag
       }
     ]);
-    setModalVisible(false);
-    storeToDoItems(toDoItems);
+    setAddModalVisible(false);
+    console.log(toDoItems);
     return toDoItems.length;
   }
-  function deleteItem(id: number) {
+  function deleteItem(id: string) {
     const newToDoItems = toDoItems.filter((item) => item.id != id)
     console.log(newToDoItems);
-     setToDoItems(newToDoItems as { id: number, name: string, isChecked: boolean, deleted: boolean}[]);
-     storeToDoItems(toDoItems);
+     setToDoItems(newToDoItems as { id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}[]);
   }
-
+  function editItem(name: string, tag: string) {
+    //https://react.dev/learn/updating-arrays-in-state#replacing-items-in-an-array
+    const id = currentEdit;
+    const nextToDoItems = toDoItems.map((item, index) => {
+      if (item.id == id) {
+        return {
+          ...item,
+          name: name,
+          tag: tag
+        }
+      } else {
+        return item;
+      }
+    })
+    setToDoItems(nextToDoItems);
+    setEditModalVisible(false);
+  }
+  function compareItems(val1: { id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}, val2: { id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}) {
+    const date1 = new Date(val1.dateAdded);
+    const date2 = new Date(val2.dateAdded);
+    return date2.getTime() - date1.getTime();
+  }
   useEffect(() => {
     getToDoItems();
-  }, [])
+    if (toDoItems == null) {
+      storeToDoItems([]);
+      getToDoItems();
+    }
+    setInit(true);
+  }, [init])
 
   useEffect(() => {
     let ignore = false;
-    const getToDoItems = async () => {
+    const save = async () => {
       try {
         let fetchedItems;
         const jsonValue = await AsyncStorage.getItem('todo-items');
-        if (!ignore) {
+        if (!ignore && init) {
           fetchedItems = jsonValue != null ? JSON.parse(jsonValue) : null
-          if (JSON.stringify(fetchedItems) != JSON.stringify(toDoItems)) {
+          if (fetchedItems != JSON.stringify(toDoItems)) {
             console.log("Testings")
-            setToDoItems(fetchedItems);
+            const jsonValue2 = JSON.stringify(toDoItems);
+            await AsyncStorage.setItem('todo-items', jsonValue2);
           }
         }
       } catch (e) {
         alert("There was a problem syncing your to-do list items. Please relaunch and try again.")
       }
     }
-    getToDoItems();
+    save();
     return () => {
       ignore = true;
     };
-}, [toDoItems])
+}, [toDoItems, init])
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Huskytasks</Text>
-        <AddItemButton addItem={() => setModalVisible(true)} />
+        <AddItemButton addItem={() => setAddModalVisible(true)} />
       </View>
       <Statistics totalTasks={toDoItems.length} incompleteTasks={toDoItems.filter(item => !item.isChecked).length} completeTasks={toDoItems.filter(item => item.isChecked).length} />
       <Pressable onPress={() => storeToDoItems([])}><Text style={styles.text}>RESET !!!</Text></Pressable>
@@ -105,33 +144,40 @@ export default function Index() {
         <View style={styles.toDoView}>
           <Text style={[styles.text, styles.secondaryHeaderText]}>To Do</Text>
           <FlatList
-            data={toDoItems.filter(item => !item.isChecked)}
+            data={toDoItems.filter(item => !item.isChecked).sort(compareItems)}
             contentContainerStyle={styles.listItems}
             scrollEnabled={true}
             renderItem={({ item }) => (
-              <ToDoItem title={item.name} isChecked={item.isChecked} deleted={item.deleted} setChecked={() => toggleChecked(item.id)} onDelete={() => deleteItem(item.id)}/>
+              <ToDoItem title={item.name} isChecked={item.isChecked} deleted={item.deleted} setChecked={() => toggleChecked(item.id)} onDelete={() => deleteItem(item.id)} onEdit={() => {setCurrentEdit(item.id); setEditModalVisible(true);}} tag={tag}/>
             )}
           />
         </View>
         <View style={styles.doneView}>
           <Text style={[styles.text, styles.secondaryHeaderText]}>Done</Text>
           <FlatList
-            data={toDoItems.filter(item => item.isChecked)}
+            data={toDoItems.filter(item => item.isChecked).sort((a, b) => b.dateAdded.getMilliseconds() - a.dateAdded.getMilliseconds())}
             contentContainerStyle={styles.listItems}
             scrollEnabled={true}
             renderItem={({ item }) => (
-              <ToDoItem title={item.name} isChecked={item.isChecked} deleted={item.deleted} setChecked={() => toggleChecked(item.id)} onDelete={() => deleteItem(item.id)}/>
+              <ToDoItem title={item.name} isChecked={item.isChecked} deleted={item.deleted} setChecked={() => toggleChecked(item.id)} onDelete={() => deleteItem(item.id)} onEdit={() => {setCurrentEdit(item.id); setEditModalVisible(true);}} tag={tag}/>
             )}
           />
         </View>
       </GestureHandlerRootView>
-      <AddItemModal isVisible={modalVisible} onComplete={() => addItem(toDoModalValue)}>
+      <AddItemModal isVisible={addModalVisible} onComplete={() => addItem(toDoModalValue)} onChangeTag={setTag}>
         <TextInput
           style={styles.modalTextInput}
           onChangeText={setToDoModalValue}
           value={toDoModalValue}
         />
       </AddItemModal>
+      <EditItemModal isVisible={editModalVisible} onComplete={() => editItem(toDoModalValue, tag)} onChangeTag={setTag}>
+        <TextInput
+          style={styles.modalTextInput}
+          onChangeText={setToDoModalValue}
+          value={toDoModalValue}
+        />
+      </EditItemModal>
     </View>
   );
 }
@@ -170,10 +216,13 @@ const styles = StyleSheet.create({
   },
   modalTextInput: {
     padding: 5,
-    borderWidth: 1,
-    borderColor: "#999",
-    height: 25,
-    width: "80%"
+    borderWidth: 2,
+    borderColor: "light-blue",
+    borderRadius: 5,
+    backgroundColor: "#eee",
+    height: 40,
+    marginBottom: 10,
+    textAlign: "center"
   },
   toDoView: {
     flex: 1,

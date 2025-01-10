@@ -2,19 +2,19 @@ import { PropsWithChildren } from "react";
 import { Modal, KeyboardAvoidingView, StyleSheet, Text } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons";
 
-import AddItemModalButton from "./AddItemModalButton";
+import EditItemModalButton from "./EditItemModalButton";
 type Props = PropsWithChildren<{
     isVisible: boolean,
     onComplete: () => void,
     onChangeTag: (tag: string) => void
 }>
-export default function AddItemModal({isVisible, children, onComplete, onChangeTag}: Props) {
+export default function EditItemModal({isVisible, children, onComplete, onChangeTag}: Props) {
     return (
         <Modal animationType="slide" visible={isVisible} transparent={true}>
             <KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
-                <Text style={styles.heading}>What should the task be named?</Text>
+                <Text style={styles.heading}>Edit this task</Text>
                 {children}
-                <AddItemModalButton onPress={onComplete} />
+                <EditItemModalButton onPress={onComplete} />
             </KeyboardAvoidingView>
         </Modal>
     )
@@ -33,12 +33,6 @@ export const styles = StyleSheet.create({
     },
     heading: {
         fontSize: 30,
-        fontWeight: "bold",
-        color: "#fff",
-        marginBottom: 10
-    },
-    smallHeading: {
-        fontSize: 20,
         fontWeight: "bold",
         color: "#fff",
         marginBottom: 10
