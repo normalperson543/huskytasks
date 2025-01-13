@@ -7,13 +7,16 @@ type Props = {
     isChecked: boolean;
     onValueChange: () => void;
     onClick: () => void;
+    color: string;
 }
-export default function ItemCheckbox({title, isChecked, onValueChange, onClick}: Props) {
-
+export default function ItemCheckbox({title, isChecked, onValueChange, onClick, color}: Props) {
+  console.log("BEEP")
+  console.log(color);
   return (
     <View style={styles.section}>
       <Checkbox style={styles.checkbox} value={isChecked} onValueChange={onValueChange} />
-      <Pressable style={styles.innerContainer} onPress={onClick}>
+      <Pressable style={[{borderColor: color ? color : "#20d782"}, styles.innerContainer]} onPress={onClick}>
+        {color && <View style={[{backgroundColor: color}, styles.circle]}></View>}
         <Text style={styles.text}>{title}</Text>
       </Pressable>
     </View>
@@ -29,10 +32,11 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   innerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     fontSize: 15,
     borderWidth: 2,
     borderRadius: 10,
-    borderColor: "#20d782",
     padding: 10,
     flexGrow: 1
   },
@@ -42,4 +46,10 @@ const styles = StyleSheet.create({
   checkbox: {
     margin: 8,
   },
+  circle: {
+    width: 10,
+    height: 10,
+    borderRadius: 10000000,
+    marginRight: 10
+  }
 });

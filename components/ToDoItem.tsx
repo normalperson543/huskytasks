@@ -12,10 +12,9 @@ type Props = {
 }
 
 export default function ToDoItem({isChecked, title, deleted, setChecked, onDelete, onEdit, tag}: Props) {
-    if (deleted) return;
     return (
         <View style={styles.toDoItem}>
-            <ItemCheckbox  title={title} isChecked={isChecked} onValueChange={() => {setChecked()}} onClick={onEdit}/>
+            <ItemCheckbox  title={title} isChecked={isChecked} onValueChange={() => {setChecked()}} onClick={onEdit} color={tag}/>
             <DeleteItemButton onClick={onDelete} />
         </View>
     )

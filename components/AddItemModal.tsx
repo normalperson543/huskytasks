@@ -1,19 +1,28 @@
 import { PropsWithChildren } from "react";
-import { Modal, KeyboardAvoidingView, StyleSheet, Text } from "react-native"
+import { Modal, KeyboardAvoidingView, StyleSheet, Text, View, Pressable } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons";
-
+import TagSelector from "./TagSelector";
 import AddItemModalButton from "./AddItemModalButton";
 type Props = PropsWithChildren<{
     isVisible: boolean,
     onComplete: () => void,
-    onChangeTag: (tag: string) => void
+    onChangeTag: (tag: string) => void,
+    onClose: () => void,
+    tag: string
 }>
-export default function AddItemModal({isVisible, children, onComplete, onChangeTag}: Props) {
+export default function AddItemModal({isVisible, onClose, children, onComplete, onChangeTag, tag}: Props) {
     return (
         <Modal animationType="slide" visible={isVisible} transparent={true}>
             <KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
-                <Text style={styles.heading}>What should the task be named?</Text>
+                <View style={styles.heading}>
+                    <Text style={styles.headingText}>What should the task be named?</Text>
+                    <Pressable onPress={onClose}>
+                        <MaterialIcons name="close" size={20} color="#fff" />
+                    </Pressable>
+                </View>
                 {children}
+                <Text style={styles.smallHeading}>Select a tag</Text>
+                <TagSelector onSelect={onChangeTag} tag={tag}/>
                 <AddItemModalButton onPress={onComplete} />
             </KeyboardAvoidingView>
         </Modal>
@@ -32,10 +41,14 @@ export const styles = StyleSheet.create({
         bottom: 0,
     },
     heading: {
+        flexDirection: "row"
+    },
+    headingText: {
         fontSize: 30,
         fontWeight: "bold",
         color: "#fff",
-        marginBottom: 10
+        marginBottom: 10,
+        flexGrow: 1
     },
     smallHeading: {
         fontSize: 20,

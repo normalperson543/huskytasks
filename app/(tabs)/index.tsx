@@ -11,6 +11,9 @@ import EditItemModal from "@/components/EditItemModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Statistics from "@/components/Statistics";
 import uuid from "react-native-uuid";
+import { ScrollView } from "react-native-gesture-handler";
+import NoItemFiller from "@/components/NoItemFiller";
+import SmallButton from "@/components/SmallButton";
 import TagSelector from "@/components/TagSelector";
 
 export default function Index() {
@@ -20,6 +23,7 @@ export default function Index() {
   const [currentEdit, setCurrentEdit] = useState("");
   const [toDoModalValue, setToDoModalValue] = useState("");
   const [tag, setTag] = useState("");
+  const [filterTag, setFilterTag] = useState("");
   const [init, setInit] = useState(false);
 
   const getToDoItems = async () => {
@@ -100,6 +104,17 @@ export default function Index() {
     const date2 = new Date(val2.dateAdded);
     return date2.getTime() - date1.getTime();
   }
+  function changeTag(newTag: string) {
+    console.log(newTag);
+    setTag(newTag);
+  }
+  function deleteAllDoneTasks() {
+    if (filterTag == "") {
+      setToDoItems(toDoItems.filter(item => !item.isChecked));
+    } else {
+      setToDoItems(toDoItems.filter(item => !(item.isChecked && item.tag == filterTag)));
+    }
+  }
   useEffect(() => {
     getToDoItems();
     if (toDoItems == null) {
@@ -131,49 +146,75 @@ export default function Index() {
     return () => {
       ignore = true;
     };
-}, [toDoItems, init])
+  }, [toDoItems, init])
+  
+  let toDoRenderItems = toDoItems.filter(item => !item.isChecked);
+  let doneRenderItems = toDoItems.filter(item => item.isChecked);
+  if (filterTag != "") {
+    console.log("HELLO")
+    toDoRenderItems = toDoRenderItems.filter(item => item.tag == filterTag);
+    doneRenderItems = doneRenderItems.filter(item => item.tag == filterTag);
+  }
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Huskytasks</Text>
-        <AddItemButton addItem={() => setAddModalVisible(true)} />
+        <AddItemButton addItem={() => {setTag(""); setAddModalVisible(true);}} />
       </View>
       <Statistics totalTasks={toDoItems.length} incompleteTasks={toDoItems.filter(item => !item.isChecked).length} completeTasks={toDoItems.filter(item => item.isChecked).length} />
-      <Pressable onPress={() => storeToDoItems([])}><Text style={styles.text}>RESET !!!</Text></Pressable>
       <GestureHandlerRootView style={{flex: 1}}>
-        <View style={styles.toDoView}>
-          <Text style={[styles.text, styles.secondaryHeaderText]}>To Do</Text>
-          <FlatList
-            data={toDoItems.filter(item => !item.isChecked).sort(compareItems)}
-            contentContainerStyle={styles.listItems}
-            scrollEnabled={true}
-            renderItem={({ item }) => (
-              <ToDoItem title={item.name} isChecked={item.isChecked} deleted={item.deleted} setChecked={() => toggleChecked(item.id)} onDelete={() => deleteItem(item.id)} onEdit={() => {setCurrentEdit(item.id); setEditModalVisible(true);}} tag={tag}/>
-            )}
-          />
-        </View>
-        <View style={styles.doneView}>
-          <Text style={[styles.text, styles.secondaryHeaderText]}>Done</Text>
-          <FlatList
-            data={toDoItems.filter(item => item.isChecked).sort((a, b) => b.dateAdded.getMilliseconds() - a.dateAdded.getMilliseconds())}
-            contentContainerStyle={styles.listItems}
-            scrollEnabled={true}
-            renderItem={({ item }) => (
-              <ToDoItem title={item.name} isChecked={item.isChecked} deleted={item.deleted} setChecked={() => toggleChecked(item.id)} onDelete={() => deleteItem(item.id)} onEdit={() => {setCurrentEdit(item.id); setEditModalVisible(true);}} tag={tag}/>
-            )}
-          />
-        </View>
+        <TagSelector onSelect={setFilterTag} tag={filterTag}/>
+        <ScrollView>
+          <View style={styles.toDoView}>
+            <Text style={[styles.text, styles.secondaryHeaderText]}>To Do</Text>
+            {toDoRenderItems.length == 0 ? <NoItemFiller text="You're all caught up"/> : 
+             toDoRenderItems.sort(compareItems).map((item) => 
+                <ToDoItem 
+                  title={item.name} 
+                  isChecked={item.isChecked} 
+                  deleted={item.deleted} 
+                  setChecked={() => toggleChecked(item.id)} 
+                  onDelete={() => deleteItem(item.id)}
+                  onEdit={() => {setCurrentEdit(item.id); setTag(item.tag); setEditModalVisible(true);}}
+                  tag={item.tag}
+                  key={item.id}
+                />)
+            }
+          </View>
+          <View style={styles.doneView}>
+            <View style={styles.smallHeadingContainer}>
+              <Text style={[styles.text, styles.secondaryHeaderText]}>Done</Text>
+              {doneRenderItems.length != 0 &&
+                <SmallButton onClick={deleteAllDoneTasks} text="Clear" />
+              }
+            </View>
+            
+            {doneRenderItems.length == 0 ? <NoItemFiller text="Let's accomplish something meaningful"/> : 
+              doneRenderItems.sort(compareItems).map((item) => 
+                <ToDoItem 
+                  title={item.name} 
+                  isChecked={item.isChecked} 
+                  deleted={item.deleted} 
+                  setChecked={() => toggleChecked(item.id)} 
+                  onDelete={() => deleteItem(item.id)}
+                  onEdit={() => {setCurrentEdit(item.id); setTag(item.tag); setEditModalVisible(true);}}
+                  tag={item.tag}
+                  key={item.id}
+                />)
+            }
+          </View>
+        </ScrollView>
       </GestureHandlerRootView>
-      <AddItemModal isVisible={addModalVisible} onComplete={() => addItem(toDoModalValue)} onChangeTag={setTag}>
+      <AddItemModal isVisible={addModalVisible} onComplete={() => addItem(toDoModalValue)} onChangeTag={changeTag} onClose={() => setAddModalVisible(false)} tag={tag}>
         <TextInput
-          style={styles.modalTextInput}
+          style={[{borderColor: tag != "" ? tag : "light-blue"}, styles.modalTextInput]} 
           onChangeText={setToDoModalValue}
           value={toDoModalValue}
         />
       </AddItemModal>
-      <EditItemModal isVisible={editModalVisible} onComplete={() => editItem(toDoModalValue, tag)} onChangeTag={setTag}>
+      <EditItemModal isVisible={editModalVisible} onComplete={() => editItem(toDoModalValue, tag)} onChangeTag={changeTag} onClose={() => setEditModalVisible(false)} tag={tag}>
         <TextInput
-          style={styles.modalTextInput}
+          style={[{borderColor: tag != "" ? tag : "light-blue"}, styles.modalTextInput]}
           onChangeText={setToDoModalValue}
           value={toDoModalValue}
         />
@@ -209,6 +250,7 @@ const styles = StyleSheet.create({
   secondaryHeaderText: {
     fontWeight: "bold",
     fontSize: 20,
+    flexGrow: 1
   },
   listItems: {
     flexDirection: "column",
@@ -217,7 +259,6 @@ const styles = StyleSheet.create({
   modalTextInput: {
     padding: 5,
     borderWidth: 2,
-    borderColor: "light-blue",
     borderRadius: 5,
     backgroundColor: "#eee",
     height: 40,
@@ -233,5 +274,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     width: "100%"
+  },
+  smallHeadingContainer: {
+    flexDirection: "row",
+    alignItems: "center"
   }
 })
