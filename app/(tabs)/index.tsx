@@ -16,8 +16,17 @@ import NoItemFiller from "@/components/NoItemFiller";
 import SmallButton from "@/components/SmallButton";
 import TagSelector from "@/components/TagSelector";
 
+type ToDoItem = {
+  id: string, 
+  name: string, 
+  dateAdded: Date, 
+  isChecked: boolean, 
+  deleted: boolean, 
+  tag: string,
+  dueDate: Date | null
+}
 export default function Index() {
-  const [toDoItems, setToDoItems] = useState<{id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}[]>([]);
+  const [toDoItems, setToDoItems] = useState<ToDoItem[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [currentEdit, setCurrentEdit] = useState("");
@@ -25,6 +34,7 @@ export default function Index() {
   const [tag, setTag] = useState("");
   const [filterTag, setFilterTag] = useState("");
   const [init, setInit] = useState(false);
+  const [dueDate, setDueDate] = useState<Date | null>(null);
 
   const getToDoItems = async () => {
     try {
@@ -40,7 +50,7 @@ export default function Index() {
       alert("There was a problem getting your to-do list items. Please relaunch and try again.")
     }
   }
-  const storeToDoItems = async (value: {id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}[]) => {
+  const storeToDoItems = async (value: ToDoItem[]) => {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem('todo-items', jsonValue);
@@ -58,7 +68,7 @@ export default function Index() {
       } else return item;
      })
      console.log(newToDoItems);
-     setToDoItems(newToDoItems as { id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}[]);
+     setToDoItems(newToDoItems as ToDoItem[]);
   }
   function addItem(name: string) {
     const generatedUUID = uuid.v4();
@@ -70,7 +80,8 @@ export default function Index() {
         dateAdded: new Date(),
         isChecked: false,
         deleted: false,
-        tag: tag
+        tag: tag,
+        dueDate: dueDate
       }
     ]);
     setAddModalVisible(false);
@@ -80,7 +91,7 @@ export default function Index() {
   function deleteItem(id: string) {
     const newToDoItems = toDoItems.filter((item) => item.id != id)
     console.log(newToDoItems);
-     setToDoItems(newToDoItems as { id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}[]);
+     setToDoItems(newToDoItems as ToDoItem[]);
   }
   function editItem(name: string, tag: string) {
     //https://react.dev/learn/updating-arrays-in-state#replacing-items-in-an-array
@@ -90,7 +101,8 @@ export default function Index() {
         return {
           ...item,
           name: name,
-          tag: tag
+          tag: tag,
+          dueDate: dueDate
         }
       } else {
         return item;
@@ -99,7 +111,7 @@ export default function Index() {
     setToDoItems(nextToDoItems);
     setEditModalVisible(false);
   }
-  function compareItems(val1: { id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}, val2: { id: string, name: string, dateAdded: Date, isChecked: boolean, deleted: boolean, tag: string}) {
+  function compareItems(val1: ToDoItem, val2: ToDoItem) {
     const date1 = new Date(val1.dateAdded);
     const date2 = new Date(val2.dateAdded);
     return date2.getTime() - date1.getTime();
@@ -114,6 +126,18 @@ export default function Index() {
     } else {
       setToDoItems(toDoItems.filter(item => !(item.isChecked && item.tag == filterTag)));
     }
+  }
+  function addButtonEvent() {
+    setTag("");
+    setToDoModalValue("");
+    setDueDate(null);
+    setAddModalVisible(true);
+  }
+  function editButtonEvent(item: ToDoItem) {
+    setCurrentEdit(item.id); 
+    setTag(item.tag); 
+    setDueDate(item.dueDate)
+    setEditModalVisible(true);
   }
   useEffect(() => {
     getToDoItems();
@@ -159,7 +183,7 @@ export default function Index() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Huskytasks</Text>
-        <AddItemButton addItem={() => {setTag(""); setAddModalVisible(true);}} />
+        <AddItemButton addItem={addButtonEvent} />
       </View>
       <Statistics totalTasks={toDoItems.length} incompleteTasks={toDoItems.filter(item => !item.isChecked).length} completeTasks={toDoItems.filter(item => item.isChecked).length} />
       <GestureHandlerRootView style={{flex: 1}}>
@@ -175,9 +199,10 @@ export default function Index() {
                   deleted={item.deleted} 
                   setChecked={() => toggleChecked(item.id)} 
                   onDelete={() => deleteItem(item.id)}
-                  onEdit={() => {setCurrentEdit(item.id); setTag(item.tag); setEditModalVisible(true);}}
+                  onEdit={() => {editButtonEvent(item)}}
                   tag={item.tag}
                   key={item.id}
+                  dueDate={item.dueDate}
                 />)
             }
           </View>
@@ -197,22 +222,23 @@ export default function Index() {
                   deleted={item.deleted} 
                   setChecked={() => toggleChecked(item.id)} 
                   onDelete={() => deleteItem(item.id)}
-                  onEdit={() => {setCurrentEdit(item.id); setTag(item.tag); setEditModalVisible(true);}}
+                  onEdit={() => {editButtonEvent(item)}}
                   tag={item.tag}
                   key={item.id}
+                  dueDate={item.dueDate}
                 />)
             }
           </View>
         </ScrollView>
       </GestureHandlerRootView>
-      <AddItemModal isVisible={addModalVisible} onComplete={() => addItem(toDoModalValue)} onChangeTag={changeTag} onClose={() => setAddModalVisible(false)} tag={tag}>
+      <AddItemModal isVisible={addModalVisible} onComplete={() => addItem(toDoModalValue)} onChangeTag={changeTag} onClose={() => setAddModalVisible(false)} tag={tag} dueDate={dueDate} onChangeDate={setDueDate}>
         <TextInput
           style={[{borderColor: tag != "" ? tag : "light-blue"}, styles.modalTextInput]} 
           onChangeText={setToDoModalValue}
           value={toDoModalValue}
         />
       </AddItemModal>
-      <EditItemModal isVisible={editModalVisible} onComplete={() => editItem(toDoModalValue, tag)} onChangeTag={changeTag} onClose={() => setEditModalVisible(false)} tag={tag}>
+      <EditItemModal isVisible={editModalVisible} onComplete={() => editItem(toDoModalValue, tag)} onChangeTag={changeTag} onClose={() => setEditModalVisible(false)} tag={tag} dueDate={dueDate} onChangeDate={setDueDate}>
         <TextInput
           style={[{borderColor: tag != "" ? tag : "light-blue"}, styles.modalTextInput]}
           onChangeText={setToDoModalValue}

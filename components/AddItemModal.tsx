@@ -3,14 +3,26 @@ import { Modal, KeyboardAvoidingView, StyleSheet, Text, View, Pressable } from "
 import { MaterialIcons } from "@expo/vector-icons";
 import TagSelector from "./TagSelector";
 import AddItemModalButton from "./AddItemModalButton";
+import { Calendar } from "react-native-calendars";
+
 type Props = PropsWithChildren<{
     isVisible: boolean,
     onComplete: () => void,
     onChangeTag: (tag: string) => void,
     onClose: () => void,
-    tag: string
+    tag: string,
+    dueDate: Date | null,
+    onChangeDate: (date: Date) => void
 }>
-export default function AddItemModal({isVisible, onClose, children, onComplete, onChangeTag, tag}: Props) {
+
+type RNCalendarDate = {
+    dateString: string,
+    day: number,
+    month: number,
+    timestamp: string,
+    year: number
+}
+export default function AddItemModal({isVisible, onClose, children, onComplete, onChangeTag, tag, dueDate, onChangeDate}: Props) {
     return (
         <Modal animationType="slide" visible={isVisible} transparent={true}>
             <KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
@@ -23,6 +35,8 @@ export default function AddItemModal({isVisible, onClose, children, onComplete, 
                 {children}
                 <Text style={styles.smallHeading}>Select a tag</Text>
                 <TagSelector onSelect={onChangeTag} tag={tag}/>
+                <Text style={styles.smallHeading}>When is this due?</Text>
+                <Calendar onDayPress={(date: RNCalendarDate) => onChangeDate(new Date(date.timestamp))} markedDates={{[dueDate ? (dueDate as Date).toISOString().slice(0, 10) : ""]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}}}/>
                 <AddItemModalButton onPress={onComplete} />
             </KeyboardAvoidingView>
         </Modal>
