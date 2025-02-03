@@ -12,7 +12,8 @@ type Props = PropsWithChildren<{
     onClose: () => void,
     tag: string,
     dueDate: Date | null,
-    onChangeDate: (date: Date) => void
+    onChangeDate: (date: Date) => void,
+    theme: string
 }>
 
 type RNCalendarDate = {
@@ -22,10 +23,10 @@ type RNCalendarDate = {
     timestamp: string,
     year: number
 }
-export default function AddItemModal({isVisible, onClose, children, onComplete, onChangeTag, tag, dueDate, onChangeDate}: Props) {
+export default function AddItemModal({isVisible, onClose, children, onComplete, onChangeTag, tag, dueDate, onChangeDate, theme}: Props) {
     return (
         <Modal animationType="slide" visible={isVisible} transparent={true}>
-            <KeyboardAvoidingView behavior="padding" style={styles.modalContainer}>
+            <KeyboardAvoidingView behavior="padding" style={[styles.modalContainer, {backgroundColor: theme}]}>
                 <View style={styles.heading}>
                     <Text style={styles.headingText}>What should the task be named?</Text>
                     <Pressable onPress={onClose}>
@@ -49,7 +50,6 @@ export const styles = StyleSheet.create({
         width: "100%",
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
-        backgroundColor: "#20d782",
         padding: 25,
         position: "absolute",
         bottom: 0,

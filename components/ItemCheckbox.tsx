@@ -8,8 +8,9 @@ type Props = {
     onValueChange: () => void;
     onClick: () => void;
     color: string;
+    theme: string;
 }
-export default function ItemCheckbox({title, isChecked, onValueChange, onClick, color}: Props) {
+export default function ItemCheckbox({title, isChecked, onValueChange, onClick, color, theme}: Props) {
   console.log("BEEP")
   console.log(color);
   return (

@@ -5,54 +5,24 @@ import RNRestart from "react-native-restart";
 import { useState } from "react";
 import DeviceInfo from "react-native-device-info";
 import ColorSelector from "@/components/ColorSelector";
-
-type ToDoItem = {
-    id: string, 
-    name: string, 
-    dateAdded: Date, 
-    isChecked: boolean, 
-    deleted: boolean, 
-    tag: string,
-    dueDate: string | undefined
-}
-
+import { getTheme, storeTheme, storeToDoItems } from "@/utils/AsyncStorage";
+import { useEffect } from "react";
 export default function Settings() {
-    const [settings, setSettings] = useState([]);
     const [color, setColor] = useState("");
-
     const [colors] = useState([
         "#20D782",
         "#C80000"
-
     ])
-    const getSettings = async () => {
-        try {
-          const jsonValue = await AsyncStorage.getItem('settings');
-          if (jsonValue == null) {
-            setSettings([]);
-          } else {
-            setSettings(JSON.parse(jsonValue as string))
-          }
-        } catch (e) {
-          alert("There was a problem getting your settings. Please relaunch and try again.")
-        }
-      }
-    const storeToDoItems = async (value: ToDoItem[]) => {
-        try {
-            const jsonValue = JSON.stringify(value);
-            await AsyncStorage.setItem('todo-items', jsonValue);
-        } catch (e) {
-            alert("There was a problem saving your to-do items. Please try again.");
-        }
+
+    function onSetColor(color: string) {
+        setColor(color);
+        storeTheme(color);
+        getTheme(setColor);
+        RNRestart.restart();
     }
-    const storeSettings = async (value: any[]) => {
-        try {
-            const jsonValue = JSON.stringify(value);
-            await AsyncStorage.setItem('settings', jsonValue);
-        } catch (e) {
-            alert("There was a problem saving your settings. Please try again.");
-        }
-    }
+
+    getTheme(setColor);
+   
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -60,7 +30,7 @@ export default function Settings() {
             </View>
             <SettingsItem name="Reset app settings" description="This cannot be undone!" onClick={() => {storeToDoItems([]); RNRestart.restart();}} />
             {<SettingsItem name="About this app" description={`Huskytasks ${DeviceInfo.getVersion()}`} onClick={() => {alert(`Build ${DeviceInfo.getBuildNumber()}`)}} />}
-            <ColorSelector colors={colors} selectedColor={color} onSelectColor={setColor} />
+            <ColorSelector colors={colors} selectedColor={color} onSelectColor={onSetColor} />
         </View>
     )
 }

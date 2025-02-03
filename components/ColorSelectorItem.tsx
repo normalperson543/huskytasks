@@ -8,7 +8,7 @@ type Props = {
 export default function ColorSelectorItem({color, onPress, selected}: Props) {
     return (
         <Pressable onPress={onPress}>
-            <View style={[styles.container, {backgroundColor: color}]} >
+            <View style={[styles.container, {backgroundColor: color}, selected && {borderWidth: 3, borderColor: "green"}]} >
             </View>
         </Pressable>
     )

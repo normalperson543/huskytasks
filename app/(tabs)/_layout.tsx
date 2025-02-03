@@ -1,12 +1,18 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getTheme } from '@/utils/AsyncStorage';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TabLayout() {
+    const [themeColor, setThemeColor] = useState("");
+
+    getTheme(setThemeColor);
+
     return (
         <Tabs
             screenOptions={{
-                tabBarActiveTintColor: '#20D782',
+                tabBarActiveTintColor: themeColor,
                 headerStyle: {
                     backgroundColor: '#000',
                 },

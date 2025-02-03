@@ -1,12 +1,14 @@
 import { Pressable, Text, StyleSheet } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
+import { getTheme } from "@/utils/AsyncStorage"
 type Props = {
-    addItem: () =>  void
+    addItem: () =>  void,
+    theme: string
 }
-export default function AddItemButton({addItem}: Props) {
+export default function AddItemButton({addItem, theme}: Props) {
     return (
-        <Pressable onPress={addItem} style={styles.addItemBtn}>
-            <MaterialIcons name="add" size={40} color="#000" />
+        <Pressable onPress={addItem} style={[styles.addItemBtn, {backgroundColor: theme}]}>
+            <MaterialIcons name="add" size={40} color="#fff" />
         </Pressable>
     )
 }
@@ -14,7 +16,6 @@ export default function AddItemButton({addItem}: Props) {
 const styles = StyleSheet.create({
     addItemBtn: {
         borderRadius: 10000,
-        backgroundColor: "#20d782",
         padding: 10,
         display: "flex",
         justifyContent: "center",

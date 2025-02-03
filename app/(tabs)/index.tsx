@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 import { useState, useEffect } from 'react';
-import ToDoItem from "@/components/ToDoItem";
+import ToDoTaskItem from "@/components/ToDoTaskItem";
 import { Pressable } from "react-native";
 import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import AddItemButton from "@/components/AddItemButton";
@@ -15,16 +15,9 @@ import { ScrollView } from "react-native-gesture-handler";
 import NoItemFiller from "@/components/NoItemFiller";
 import SmallButton from "@/components/SmallButton";
 import TagSelector from "@/components/TagSelector";
+import { ToDoItem } from "@/utils/types";
+import { getTheme, getToDoItems, storeToDoItems } from "@/utils/AsyncStorage";
 
-type ToDoItem = {
-  id: string, 
-  name: string, 
-  dateAdded: Date, 
-  isChecked: boolean, 
-  deleted: boolean, 
-  tag: string,
-  dueDate: Date | null
-}
 export default function Index() {
   const [toDoItems, setToDoItems] = useState<ToDoItem[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -35,29 +28,10 @@ export default function Index() {
   const [filterTag, setFilterTag] = useState("");
   const [init, setInit] = useState(false);
   const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [themeColor, setThemeColor] = useState("");
 
-  const getToDoItems = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('todo-items');
-      console.log(jsonValue);
-      if (jsonValue == null) {
-        setToDoItems([]);
-        storeToDoItems([]);
-      } else {
-        setToDoItems(JSON.parse(jsonValue as string))
-      }
-    } catch (e) {
-      alert("There was a problem getting your to-do list items. Please relaunch and try again.")
-    }
-  }
-  const storeToDoItems = async (value: ToDoItem[]) => {
-    try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem('todo-items', jsonValue);
-    } catch (e) {
-      alert("There was a problem saving your to-do list items. Please try again.");
-    }
-  }
+  getTheme(setThemeColor);
+  
   function toggleChecked(id: string) {
      const newToDoItems = toDoItems.map((item) => {
       if (item.id == id) {
@@ -140,10 +114,10 @@ export default function Index() {
     setEditModalVisible(true);
   }
   useEffect(() => {
-    getToDoItems();
+    getToDoItems(setToDoItems);
     if (toDoItems == null) {
       storeToDoItems([]);
-      getToDoItems();
+      getToDoItems(setToDoItems);
     }
     setInit(true);
   }, [init])
@@ -183,7 +157,7 @@ export default function Index() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Huskytasks</Text>
-        <AddItemButton addItem={addButtonEvent} />
+        <AddItemButton addItem={addButtonEvent} theme={themeColor}/>
       </View>
       <Statistics totalTasks={toDoItems.length} incompleteTasks={toDoItems.filter(item => !item.isChecked).length} completeTasks={toDoItems.filter(item => item.isChecked).length} />
       <GestureHandlerRootView style={{flex: 1}}>
@@ -193,7 +167,7 @@ export default function Index() {
             <Text style={[styles.text, styles.secondaryHeaderText]}>To Do</Text>
             {toDoRenderItems.length == 0 ? <NoItemFiller text="You're all caught up"/> : 
              toDoRenderItems.sort(compareItems).map((item) => 
-                <ToDoItem 
+                <ToDoTaskItem 
                   title={item.name} 
                   isChecked={item.isChecked} 
                   deleted={item.deleted} 
@@ -203,6 +177,7 @@ export default function Index() {
                   tag={item.tag}
                   key={item.id}
                   dueDate={item.dueDate}
+                  theme={themeColor}
                 />)
             }
           </View>
@@ -216,7 +191,7 @@ export default function Index() {
             
             {doneRenderItems.length == 0 ? <NoItemFiller text="Let's accomplish something meaningful"/> : 
               doneRenderItems.sort(compareItems).map((item) => 
-                <ToDoItem 
+                <ToDoTaskItem 
                   title={item.name} 
                   isChecked={item.isChecked} 
                   deleted={item.deleted} 
@@ -226,19 +201,20 @@ export default function Index() {
                   tag={item.tag}
                   key={item.id}
                   dueDate={item.dueDate}
+                  theme={themeColor}
                 />)
             }
           </View>
         </ScrollView>
       </GestureHandlerRootView>
-      <AddItemModal isVisible={addModalVisible} onComplete={() => addItem(toDoModalValue)} onChangeTag={changeTag} onClose={() => setAddModalVisible(false)} tag={tag} dueDate={dueDate} onChangeDate={setDueDate}>
+      <AddItemModal isVisible={addModalVisible} onComplete={() => addItem(toDoModalValue)} onChangeTag={changeTag} onClose={() => setAddModalVisible(false)} tag={tag} dueDate={dueDate} onChangeDate={setDueDate} theme={themeColor}>
         <TextInput
           style={[{borderColor: tag != "" ? tag : "light-blue"}, styles.modalTextInput]} 
           onChangeText={setToDoModalValue}
           value={toDoModalValue}
         />
       </AddItemModal>
-      <EditItemModal isVisible={editModalVisible} onComplete={() => editItem(toDoModalValue, tag)} onChangeTag={changeTag} onClose={() => setEditModalVisible(false)} tag={tag} dueDate={dueDate} onChangeDate={setDueDate}>
+      <EditItemModal isVisible={editModalVisible} onComplete={() => editItem(toDoModalValue, tag)} onChangeTag={changeTag} onClose={() => setEditModalVisible(false)} tag={tag} dueDate={dueDate} onChangeDate={setDueDate} theme={themeColor}>
         <TextInput
           style={[{borderColor: tag != "" ? tag : "light-blue"}, styles.modalTextInput]}
           onChangeText={setToDoModalValue}

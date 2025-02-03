@@ -1,3 +1,5 @@
+import { getTheme } from "@/utils/AsyncStorage";
+import { useState } from "react";
 import { View, StyleSheet, Text } from "react-native"
 type Props = {
     totalTasks: number,
@@ -5,8 +7,12 @@ type Props = {
     completeTasks: number
 }
 export default function Statistics({totalTasks, incompleteTasks, completeTasks}: Props) {
+    const [themeColor, setThemeColor] = useState("");
+    
+    getTheme(setThemeColor);
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, {backgroundColor: themeColor}]}>
             <View style={styles.statisticContainer}>
                 <Text style={styles.bigStatistic}>{totalTasks}</Text>
                 <Text style={styles.statisticDesc}>total tasks</Text>
@@ -25,7 +31,6 @@ export default function Statistics({totalTasks, incompleteTasks, completeTasks}:
 const styles = StyleSheet.create({
     container: {
         padding: 10,
-        backgroundColor: "#20D782",
         borderRadius: 5,
         color: "#fff",
         flexDirection: "row",
