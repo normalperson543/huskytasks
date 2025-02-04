@@ -2,11 +2,12 @@ import { Pressable, Text, StyleSheet, StyleProp } from "react-native"
 
 type Props = {
     onClick: () => void,
-    text: string
+    text: string,
+    theme: string
 }
-export default function SmallButton({onClick, text}: Props) {
+export default function SmallButton({onClick, text, theme}: Props) {
     return (
-        <Pressable style={styles.container} onPress={onClick}>
+        <Pressable style={[styles.container, {backgroundColor: theme}]} onPress={onClick}>
             <Text style={styles.text}>{text}</Text>
         </Pressable>
     )

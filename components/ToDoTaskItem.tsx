@@ -1,6 +1,7 @@
 import { View, StyleSheet, Text } from "react-native";
 import ItemCheckbox from "@/components/ItemCheckbox";
 import DeleteItemButton from "./DeleteItemButton";
+import stringifyDate from "@/utils/dateStringify";
 type Props = {
     title: string;
     isChecked: boolean;
@@ -16,26 +17,18 @@ type Props = {
 
 export default function ToDoTaskItem({isChecked, title, setChecked, onDelete, onEdit, tag, dueDate, theme}: Props) {
     const today = new Date();
-    console.log("ejgor")
-    console.log(dueDate == null);
+    console.log("Today");
+    console.log(today);
 
-    let dueDateElement;
-    if (dueDate && dueDate != null) {
-        if (dueDate.toISOString().slice(0, 10) === today.toISOString().slice(0, 10)) {
-            dueDateElement = <Text style={styles.dueNow}>Due {dueDate.toISOString().slice(0, 10)}</Text>;
-        } else if (today > (dueDate as Date)) {
-            dueDateElement = <Text style={styles.pastDue}>Due {(dueDate as Date).toISOString().slice(0, 10)}</Text>;
-        } else {
-            dueDateElement = <Text style={styles.dueDate}>Due {(dueDate as Date).toISOString().slice(0, 10)}</Text>
-        }
-    }
+    const dueDateString = stringifyDate(dueDate);
+    const todayDateString = today.toISOString().slice(0, 10);
     return (
         <View style={styles.container}>
             <View style={styles.toDoItem}>
                 <ItemCheckbox  title={title} isChecked={isChecked} onValueChange={() => {setChecked()}} onClick={onEdit} color={tag} theme={theme}/>
                 <DeleteItemButton onClick={onDelete} />
             </View>
-            {dueDateElement}
+            <Text style={styles.dueDate}>Due {dueDateString}</Text>
         </View>
         
     )

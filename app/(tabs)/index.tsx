@@ -185,7 +185,7 @@ export default function Index() {
             <View style={styles.smallHeadingContainer}>
               <Text style={[styles.text, styles.secondaryHeaderText]}>Done</Text>
               {doneRenderItems.length != 0 &&
-                <SmallButton onClick={deleteAllDoneTasks} text="Clear" />
+                <SmallButton onClick={deleteAllDoneTasks} text="Clear" theme={themeColor} />
               }
             </View>
             

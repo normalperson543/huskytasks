@@ -4,6 +4,7 @@ import TagSelector from "./TagSelector";
 import { MaterialIcons } from "@expo/vector-icons";
 import EditItemModalButton from "./EditItemModalButton";
 import { Calendar } from "react-native-calendars";
+import stringifyDate from "@/utils/dateStringify";
 
 type Props = PropsWithChildren<{
     isVisible: boolean,
@@ -23,6 +24,7 @@ type RNCalendarDate = {
     year: number
 }
 export default function EditItemModal({isVisible, onClose, children, onComplete, onChangeTag, tag, dueDate, onChangeDate, theme}: Props) {
+    
     return (
         <Modal animationType="slide" visible={isVisible} transparent={true}>
             <KeyboardAvoidingView behavior="padding" style={[styles.modalContainer, {backgroundColor: theme}]}>
@@ -36,7 +38,7 @@ export default function EditItemModal({isVisible, onClose, children, onComplete,
                 <Text style={styles.smallHeading}>Change the tag</Text>
                 <TagSelector onSelect={onChangeTag} tag={tag}/>
                 <Text style={styles.smallHeading}>When is this due?</Text>
-                <Calendar onDayPress={(date: RNCalendarDate) => onChangeDate(new Date(date.timestamp))} markedDates={{[dueDate ? (dueDate as Date).toISOString().slice(0, 10) : ""]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}}}/>
+                <Calendar onDayPress={(date: RNCalendarDate) => onChangeDate(new Date(date.timestamp))} markedDates={{[stringifyDate(dueDate)]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}}}/>
                 <EditItemModalButton onPress={onComplete} />
             </KeyboardAvoidingView>
         </Modal>

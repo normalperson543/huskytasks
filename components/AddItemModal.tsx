@@ -4,6 +4,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import TagSelector from "./TagSelector";
 import AddItemModalButton from "./AddItemModalButton";
 import { Calendar } from "react-native-calendars";
+import stringifyDate from "@/utils/dateStringify";
 
 type Props = PropsWithChildren<{
     isVisible: boolean,
@@ -37,7 +38,7 @@ export default function AddItemModal({isVisible, onClose, children, onComplete, 
                 <Text style={styles.smallHeading}>Select a tag</Text>
                 <TagSelector onSelect={onChangeTag} tag={tag}/>
                 <Text style={styles.smallHeading}>When is this due?</Text>
-                <Calendar onDayPress={(date: RNCalendarDate) => onChangeDate(new Date(date.timestamp))} markedDates={{[dueDate ? (dueDate as Date).toISOString().slice(0, 10) : ""]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}}}/>
+                <Calendar onDayPress={(date: RNCalendarDate) => onChangeDate(new Date(date.timestamp))} markedDates={{[stringifyDate(dueDate)]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}}}/>
                 <AddItemModalButton onPress={onComplete} />
             </KeyboardAvoidingView>
         </Modal>

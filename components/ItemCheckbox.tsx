@@ -16,7 +16,7 @@ export default function ItemCheckbox({title, isChecked, onValueChange, onClick, 
   return (
     <View style={styles.section}>
       <Checkbox style={styles.checkbox} value={isChecked} onValueChange={onValueChange} />
-      <Pressable style={[{borderColor: color ? color : "#20d782"}, styles.innerContainer]} onPress={onClick}>
+      <Pressable style={[{borderColor: color ? color : theme}, styles.innerContainer]} onPress={onClick}>
         {color && <View style={[{backgroundColor: color}, styles.circle]}></View>}
         <Text style={styles.text}>{title}</Text>
       </Pressable>
