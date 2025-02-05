@@ -43,12 +43,11 @@ const styles = StyleSheet.create({
     },
     bigStatistic: {
         color: "#fff",
-        fontSize: 40,
+        fontSize: 25,
         fontWeight: "bold",
         padding: 0
     },
     statisticDesc: {
-        color: "#fff",
-        fontWeight: "bold"
+        color: "#fff"
     }
 })

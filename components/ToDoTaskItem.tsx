@@ -28,7 +28,7 @@ export default function ToDoTaskItem({isChecked, title, setChecked, onDelete, on
                 <ItemCheckbox  title={title} isChecked={isChecked} onValueChange={() => {setChecked()}} onClick={onEdit} color={tag} theme={theme}/>
                 <DeleteItemButton onClick={onDelete} />
             </View>
-            <Text style={styles.dueDate}>Due {dueDateString}</Text>
+            {dueDate && <Text style={styles.dueDate}>Due {dueDateString}</Text>}
         </View>
         
     )

@@ -1,6 +1,6 @@
 import { Pressable, Text, StyleSheet } from "react-native"
 import { MaterialIcons } from "@expo/vector-icons"
-import { getTheme } from "@/utils/AsyncStorage"
+
 type Props = {
     addItem: () =>  void,
     theme: string

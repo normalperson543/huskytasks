@@ -17,6 +17,7 @@ import SmallButton from "@/components/SmallButton";
 import TagSelector from "@/components/TagSelector";
 import { ToDoItem } from "@/utils/types";
 import { getTheme, getToDoItems, storeToDoItems } from "@/utils/AsyncStorage";
+import SearchBox from "@/components/SearchBox";
 
 export default function Index() {
   const [toDoItems, setToDoItems] = useState<ToDoItem[]>([]);
@@ -29,7 +30,7 @@ export default function Index() {
   const [init, setInit] = useState(false);
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [themeColor, setThemeColor] = useState("");
-
+  const [searchString, setSearchString] = useState("");
   getTheme(setThemeColor);
   
   function toggleChecked(id: string) {
@@ -108,6 +109,7 @@ export default function Index() {
     setAddModalVisible(true);
   }
   function editButtonEvent(item: ToDoItem) {
+    setToDoModalValue(item.name);
     setCurrentEdit(item.id); 
     setTag(item.tag); 
     setDueDate(item.dueDate)
@@ -146,12 +148,17 @@ export default function Index() {
     };
   }, [toDoItems, init])
   
-  let toDoRenderItems = toDoItems.filter(item => !item.isChecked);
-  let doneRenderItems = toDoItems.filter(item => item.isChecked);
+  let searchFilterToDoItems = toDoItems;
+  if (searchString.length > 0) {
+    searchFilterToDoItems = toDoItems.filter(item => item.name.toLowerCase().includes(searchString.toLowerCase()));
+  }
+
+  let toDoRenderItems = searchFilterToDoItems.filter(item => !item.isChecked);
+  let doneRenderItems = searchFilterToDoItems.filter(item => item.isChecked);
   if (filterTag != "") {
     console.log("HELLO")
-    toDoRenderItems = toDoRenderItems.filter(item => item.tag == filterTag);
-    doneRenderItems = doneRenderItems.filter(item => item.tag == filterTag);
+    toDoRenderItems = searchFilterToDoItems.filter(item => item.tag == filterTag);
+    doneRenderItems = searchFilterToDoItems.filter(item => item.tag == filterTag);
   }
   return (
     <View style={styles.container}>
@@ -161,11 +168,12 @@ export default function Index() {
       </View>
       <Statistics totalTasks={toDoItems.length} incompleteTasks={toDoItems.filter(item => !item.isChecked).length} completeTasks={toDoItems.filter(item => item.isChecked).length} />
       <GestureHandlerRootView style={{flex: 1}}>
+        <SearchBox searchString={searchString} onChange={setSearchString} theme={themeColor} />
         <TagSelector onSelect={setFilterTag} tag={filterTag}/>
         <ScrollView>
           <View style={styles.toDoView}>
             <Text style={[styles.text, styles.secondaryHeaderText]}>To Do</Text>
-            {toDoRenderItems.length == 0 ? <NoItemFiller text="You're all caught up"/> : 
+            {toDoRenderItems.length == 0 ? <NoItemFiller text={searchString.length <= 0 ? "You're all caught up" : "No results found."}/> : 
              toDoRenderItems.sort(compareItems).map((item) => 
                 <ToDoTaskItem 
                   title={item.name} 
@@ -189,7 +197,7 @@ export default function Index() {
               }
             </View>
             
-            {doneRenderItems.length == 0 ? <NoItemFiller text="Let's accomplish something meaningful"/> : 
+            {doneRenderItems.length == 0 ? <NoItemFiller text={searchString.length <= 0 ? "Let's accomplish something meaningful" : "No results found."}/> : 
               doneRenderItems.sort(compareItems).map((item) => 
                 <ToDoTaskItem 
                   title={item.name} 
