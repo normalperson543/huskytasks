@@ -18,6 +18,7 @@ import TagSelector from "@/components/TagSelector";
 import { ToDoItem } from "@/utils/types";
 import { getTheme, getToDoItems, storeToDoItems } from "@/utils/AsyncStorage";
 import SearchBox from "@/components/SearchBox";
+import FirstTimeModal from "@/components/FirstTimeModal";
 
 export default function Index() {
   const [toDoItems, setToDoItems] = useState<ToDoItem[]>([]);
@@ -31,6 +32,8 @@ export default function Index() {
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [themeColor, setThemeColor] = useState("");
   const [searchString, setSearchString] = useState("");
+  const [firstTimeModalVisible, setFirstTimeModalVisible] = useState(false);
+
   getTheme(setThemeColor);
   
   function toggleChecked(id: string) {
@@ -116,10 +119,12 @@ export default function Index() {
     setEditModalVisible(true);
   }
   useEffect(() => {
-    getToDoItems(setToDoItems);
+    getToDoItems(setToDoItems, () => setFirstTimeModalVisible(true));
     if (toDoItems == null) {
+      //trigger 1st time setup
       storeToDoItems([]);
-      getToDoItems(setToDoItems);
+      getToDoItems(setToDoItems, () => setFirstTimeModalVisible(true));
+      setFirstTimeModalVisible(true);
     }
     setInit(true);
   }, [init])
@@ -229,6 +234,7 @@ export default function Index() {
           value={toDoModalValue}
         />
       </EditItemModal>
+      <FirstTimeModal onComplete={() => setFirstTimeModalVisible(false)} themeColor={themeColor} isVisible={firstTimeModalVisible} />
     </View>
   );
 }

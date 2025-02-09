@@ -22,6 +22,7 @@ export default function ToDoTaskItem({isChecked, title, setChecked, onDelete, on
 
     const dueDateString = stringifyDate(dueDate);
     const todayDateString = today.toISOString().slice(0, 10);
+    
     return (
         <View style={styles.container}>
             <View style={styles.toDoItem}>

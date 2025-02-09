@@ -1,12 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ToDoItem } from './types';
-export const getToDoItems = async (set: (value: ToDoItem[]) => void) => {
+export const getToDoItems = async (set: (value: ToDoItem[]) => void, firstTime: () => void) => {
   try {
     const jsonValue = await AsyncStorage.getItem('todo-items');
+    console.log("rigjreiogj")
     console.log(jsonValue);
-    if (jsonValue == null) {
+    if (jsonValue == "null") {
       set([]);
       storeToDoItems([]);
+      firstTime();
     } else {
       set(JSON.parse(jsonValue as string))
     }
@@ -14,7 +16,7 @@ export const getToDoItems = async (set: (value: ToDoItem[]) => void) => {
     alert("There was a problem getting your to-do list items. Please relaunch and try again.")
   }
 }
-export const storeToDoItems = async (value: ToDoItem[]) => {
+export const storeToDoItems = async (value: ToDoItem[] | null) => {
   try {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem('todo-items', jsonValue);
@@ -31,7 +33,7 @@ export const getTheme = async (set: (value: string) => void) => {
       set(JSON.parse(jsonValue as string))
     }
   } catch (e) {
-    alert("There was a problem getting your settings. Please relaunch and try again.")
+    alert("There was a problem getting your theme. Please relaunch and try again.")
   }
 }
 export const storeTheme = async (value: string) => {
@@ -40,6 +42,6 @@ export const storeTheme = async (value: string) => {
       await AsyncStorage.setItem('theme', jsonValue);
       console.log("Done")
   } catch (e) {
-      alert("There was a problem saving your settings. Please try again.");
+      alert("There was a problem saving your theme. Please try again.");
   }
 }

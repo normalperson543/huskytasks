@@ -4,17 +4,26 @@
     "slug": "huskytasks",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Light.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/icon.png",
+      "image": "./assets/images/splash-icon-light.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "dark": {
+        "image": "./assets/images/splash-icon-dark.png",
+        "backgroundColor": "#000000"
+      }
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.trevonnguyen.huskytasks"
+      "bundleIdentifier": "com.trevonnguyen.huskytasks",
+      "icon": {
+        "dark": "./assets/images/splash-icon-dark.png",
+        "light": "./assets/images/splash-icon-light.png",
+        "tinted": "./assets/images/splash-icon-tinted.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
