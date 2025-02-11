@@ -16,7 +16,6 @@ export default function FirstTimeModal({onComplete, themeColor, isVisible}: Prop
         <Modal visible={isVisible} animationType="slide" transparent={true}>
             <View style={[styles.modalContainer, {backgroundColor: themeColor}]}>
                 <Text style={styles.headingText}>Welcome to Huskytasks</Text>
-                <Text style={styles.description}>The tasks app that just works.</Text>
                 <View style={styles.heading}>
                     <View style={styles.circleWithNumber}><Text style={styles.bigNumber}>1</Text></View>
                     <Text style={styles.smallHeading}>Add a task</Text>
@@ -51,8 +50,7 @@ const styles = StyleSheet.create({
         gap: 5
     },
     heading: {
-        flexDirection: "row",
-        display: "flex"
+        flexDirection: "column",
     },
     headingText: {
         fontSize: 30,
@@ -65,8 +63,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         color: "#fff",
-        marginBottom: 10,
-        alignSelf: "center"
     },
     circleWithNumber: {
         padding: 10,
@@ -74,10 +70,9 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         width: 40,
         height: 40,
-        alignItems: "center",
         marginRight: 10,
         verticalAlign: "middle",
-        alignSelf: "center"
+        alignItems: "center",
     },
     bigNumber: {
         fontWeight: "bold",
