@@ -11,8 +11,6 @@ type Props = {
     theme: string;
 }
 export default function ItemCheckbox({title, isChecked, onValueChange, onClick, color, theme}: Props) {
-  console.log("BEEP")
-  console.log(color);
   return (
     <View style={styles.section}>
       <Checkbox style={styles.checkbox} value={isChecked} onValueChange={onValueChange} />

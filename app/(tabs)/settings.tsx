@@ -12,7 +12,7 @@ export default function Settings() {
     const [color, setColor] = useState("");
     const [firstTimeModalVisible, setFirstTimeModalVisible] = useState(false);
     const [colors] = useState([
-        "#20D782",
+        "#1bb16c",
         "#C80000"
     ])
 
@@ -24,8 +24,7 @@ export default function Settings() {
     }
 
     function reset() {
-        storeToDoItems(null); 
-        storeTheme("#20D782"); 
+        AsyncStorage.clear();
         RNRestart.restart();
     }
 

@@ -16,7 +16,6 @@ export default function SmallButton({onClick, text, theme}: Props) {
 const styles = StyleSheet.create({
     container: {
         padding: 5,
-        backgroundColor: "#20d782",
         borderRadius: 10,
         display: "flex",
         justifyContent: "center",

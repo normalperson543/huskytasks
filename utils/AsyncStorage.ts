@@ -3,9 +3,7 @@ import { ToDoItem } from './types';
 export const getToDoItems = async (set: (value: ToDoItem[]) => void, firstTime: () => void) => {
   try {
     const jsonValue = await AsyncStorage.getItem('todo-items');
-    console.log("rigjreiogj")
-    console.log(jsonValue);
-    if (jsonValue == "null") {
+    if (jsonValue == null) {
       set([]);
       storeToDoItems([]);
       firstTime();
@@ -13,7 +11,7 @@ export const getToDoItems = async (set: (value: ToDoItem[]) => void, firstTime: 
       set(JSON.parse(jsonValue as string))
     }
   } catch (e) {
-    alert("There was a problem getting your to-do list items. Please relaunch and try again.")
+    alert("There was a problem getting your to-do list items. Please relaunch and try again." + e)
   }
 }
 export const storeToDoItems = async (value: ToDoItem[] | null) => {
@@ -28,7 +26,7 @@ export const getTheme = async (set: (value: string) => void) => {
   try {
     const jsonValue = await AsyncStorage.getItem('theme');
     if (jsonValue == null) {
-      set("#20D782");
+      set("#1bb16c");
     } else {
       set(JSON.parse(jsonValue as string))
     }
@@ -40,7 +38,6 @@ export const storeTheme = async (value: string) => {
   try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem('theme', jsonValue);
-      console.log("Done")
   } catch (e) {
       alert("There was a problem saving your theme. Please try again.");
   }

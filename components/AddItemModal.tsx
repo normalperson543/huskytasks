@@ -5,6 +5,7 @@ import TagSelector from "./TagSelector";
 import AddItemModalButton from "./AddItemModalButton";
 import { Calendar } from "react-native-calendars";
 import stringifyDate from "@/utils/dateStringify";
+import NextStepModalButton from "./NextStepModalButton";
 
 type Props = PropsWithChildren<{
     isVisible: boolean,
@@ -14,7 +15,9 @@ type Props = PropsWithChildren<{
     tag: string,
     dueDate: Date | null,
     onChangeDate: (date: Date) => void,
-    theme: string
+    theme: string,
+    step: number,
+    onNextStep: () => void;
 }>
 
 type RNCalendarDate = {
@@ -22,24 +25,34 @@ type RNCalendarDate = {
     day: number,
     month: number,
     timestamp: string,
-    year: number
+    year: number,
 }
-export default function AddItemModal({isVisible, onClose, children, onComplete, onChangeTag, tag, dueDate, onChangeDate, theme}: Props) {
+export default function AddItemModal({isVisible, onClose, children, onComplete, onChangeTag, tag, dueDate, onChangeDate, theme, step, onNextStep}: Props) {
     return (
         <Modal animationType="slide" visible={isVisible} transparent={true}>
             <KeyboardAvoidingView behavior="padding" style={[styles.modalContainer, {backgroundColor: theme}]}>
-                <View style={styles.heading}>
-                    <Text style={styles.headingText}>What should the task be named?</Text>
+                <View style={styles.closeIcon}>
                     <Pressable onPress={onClose}>
                         <MaterialIcons name="close" size={20} color="#fff" />
                     </Pressable>
                 </View>
-                {children}
-                <Text style={styles.smallHeading}>Select a tag</Text>
-                <TagSelector onSelect={onChangeTag} tag={tag}/>
-                <Text style={styles.smallHeading}>When is this due?</Text>
-                <Calendar onDayPress={(date: RNCalendarDate) => onChangeDate(new Date(date.timestamp))} markedDates={{[stringifyDate(dueDate)]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}}}/>
-                <AddItemModalButton onPress={onComplete} />
+                {step == 1 && <>
+                    <View style={styles.heading}>
+                        <Text style={styles.headingText}>What should the task be named?</Text>
+                    </View>
+                    {children}
+                    <NextStepModalButton onPress={onNextStep} />
+                    <AddItemModalButton onPress={onComplete} />
+                </>
+                }
+                {step == 2 && <>
+                    <Text style={styles.smallHeading}>Select a tag</Text>
+                    <TagSelector onSelect={onChangeTag} tag={tag}/>
+                    <Text style={styles.smallHeading}>When is this due?</Text>
+                    <Calendar onDayPress={(date: RNCalendarDate) => onChangeDate(new Date(date.timestamp))} markedDates={{[stringifyDate(dueDate)]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}}}/>
+                    <AddItemModalButton onPress={onComplete} />
+                </>
+                }
             </KeyboardAvoidingView>
         </Modal>
     )
@@ -56,7 +69,13 @@ export const styles = StyleSheet.create({
         bottom: 0,
     },
     heading: {
-        flexDirection: "row"
+        flexDirection: "row",
+        width: "90%"
+    },
+    closeIcon: {
+        position: "absolute",
+        top: 20,
+        right: 20,
     },
     headingText: {
         fontSize: 30,
@@ -69,6 +88,7 @@ export const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         color: "#fff",
-        marginBottom: 10
+        marginBottom: 10,
+        width: "90%"
     }
 });

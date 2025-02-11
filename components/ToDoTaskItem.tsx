@@ -17,8 +17,6 @@ type Props = {
 
 export default function ToDoTaskItem({isChecked, title, setChecked, onDelete, onEdit, tag, dueDate, theme}: Props) {
     const today = new Date();
-    console.log("Today");
-    console.log(today);
 
     const dueDateString = stringifyDate(dueDate);
     const todayDateString = today.toISOString().slice(0, 10);
