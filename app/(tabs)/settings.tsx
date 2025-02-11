@@ -3,7 +3,7 @@ import SettingsItem from "@/components/SettingsItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import RNRestart from "react-native-restart";
 import { useState } from "react";
-//import DeviceInfo from "react-native-device-info";
+import DeviceInfo from "react-native-device-info";
 import ColorSelector from "@/components/ColorSelector";
 import { getTheme, storeTheme, storeToDoItems } from "@/utils/AsyncStorage";
 import FirstTimeModal from "@/components/FirstTimeModal";
@@ -37,7 +37,7 @@ export default function Settings() {
             </View>
             <ColorSelector colors={colors} selectedColor={color} onSelectColor={onSetColor} />
             <SettingsItem name="Open first time help" description="" onClick={() => {setFirstTimeModalVisible(true)}} />
-            {/*<SettingsItem name="About this app" description={`Huskytasks ${DeviceInfo.getVersion()}`} onClick={() => {alert(`Build ${DeviceInfo.getBuildNumber()}`)}} />*/}
+            <SettingsItem name="About this app" description={`Huskytasks ${DeviceInfo.getVersion()}`} onClick={() => {alert(`Build ${DeviceInfo.getBuildNumber()}`)}} />
             <SettingsItem name="Reset app settings" description="This cannot be undone!" onClick={reset} />
             <FirstTimeModal onComplete={() => setFirstTimeModalVisible(false)} themeColor={color} isVisible={firstTimeModalVisible} />
         </View>
