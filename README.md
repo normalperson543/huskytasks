@@ -15,6 +15,7 @@ This project is not affiliated with Centennial High School. It is only a project
 * Wix's React Native calendar used for the due dates (https://github.com/wix/react-native-calendars)
 * react-native-restart for the module on restarting the app (https://www.npmjs.com/package/react-native-restart)
 * react-native-uuid for the module on generating unique IDs for tasks (https://www.npmjs.com/package/react-native-uuid)
+* react-native-device-info for the module on getting the version and build # of the app (https://github.com/react-native-device-info/react-native-device-info, Stack Overflow question I found the module: https://stackoverflow.com/questions/38240859/how-to-get-a-versionname-in-react-native-app-on-android) 
 * This code snippet for the due date stringify-ing: https://stackoverflow.com/a/35922073
 * Google Fonts (https://fonts.google.com/icons) for part of the app icon
 * This Stack Overflow post for help on running code on startup: (https://stackoverflow.com/a/70669251)
